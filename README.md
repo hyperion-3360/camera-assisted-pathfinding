@@ -6,11 +6,14 @@ This also means that the code should change the path if things don't go to plan.
 
 INPUT
 -
-- Shuffleboard priorities
-- Commands
-- POI coordinates
-- Robot coordinates
-- Robot rotation
+- Shuffleboard priorities <sup>Sendable<sub>maybe</sub></sup>
+- Commands <sup>Commands</sup>
+- POI coordinates <sup>Translation2D</sup>
+- Robot coordinates <sup>Translation2D</sup>
+- Robot rotation <sup>Rotation2D</sup>
+- camera data <sub>to decide</sub>
+    - POI in view <sup>boolean</sup>
+    - POI estimated coordinates <sup>Translation2D</sup>
 
 OUTPUT
 -
