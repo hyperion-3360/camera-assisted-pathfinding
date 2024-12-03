@@ -9,10 +9,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.LinkedList;
+import java.util.Stack;
 import java.util.function.BooleanSupplier;
 
 /** Pathfinding */
-public class Pathfinding {
+public class Pathfinding implements Reward{
   public enum POI {
     Note1(0.0, 0.0, 0.0, () -> ConditionBuilder.intakeHasNote()),
     Note2(0.0, 0.0, 0.0, () -> false);
@@ -54,21 +55,47 @@ public class Pathfinding {
   private PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-  private LinkedList<Pose2d> point_list = new LinkedList<>();
+          @Override
+public double rewardFunction() {
+  // TODO put what the reward function should do
+  throw new UnsupportedOperationException("Unimplemented method 'rewardFunction'");
+}
 
-  private Pose2d makepoint(LinkedList<POI> poi) {
-    poi.removeIf(i -> (i.getConditionStatus()));
-
+      /** this function creates a list of {@link Pose2d} that can be used to make a stack
+       * 
+       * @param poi a list of filtered POIs that the robot must go through
+       * @return a list of {@link Pose2d}
+       */
+  private LinkedList<Pose2d> getPointList(LinkedList<POI> poi) {
+    LinkedList<Pose2d> point_list = new LinkedList<>();
+    
+    // make a list of coordinates
     for (POI pathPoint_poi : poi) {
       Pose2d pathPoint = new Pose2d(pathPoint_poi.getCoordinates(), pathPoint_poi.getAngle());
       point_list.add(pathPoint);
     }
 
-    return new Pose2d(point_list.getFirst().getTranslation(), point_list.getFirst().getRotation());
+    return point_list;
+}
+/** this methods goal is to filter through all the useful POIs and select the most advantageous one
+ * 
+ * @param poi a list of POIs to filter through
+ * @return The {@link Pose2d} of the most useful point
+ */
+  private Pose2d FilterPOIs(LinkedList<POI> poi) {
+    // removes POIs which conditions aren't true
+    poi.removeIf(offendingPoint -> (!offendingPoint.getConditionStatus()));
+    
+    poi.forEach(p);
+    return new Pose2d(poi.peekFirst().getCoordinates(), poi.pop().getAngle());
   }
-
+/** executes the pathfinding command meaning that the robot should go to all chosen POIs
+ * 
+ * @param poi a list of POIs that the robot must go through if condtions apply
+ * @return the command to pathfind to a specified point
+ */
   public Command doPathfinding(LinkedList<POI> poi) {
-    return Commands.run(() -> AutoBuilder.pathfindToPose(makepoint(poi), constraints));
+    return Commands.run(() -> AutoBuilder.pathfindToPose(FilterPOIs(poi), constraints));
   }
 }
 
